@@ -7,13 +7,12 @@
 #4. convert the pdf files into txt and save them---done
 #5. create a folder structure
 
-import requests, bs4, sys, webbrowser, html2text, os , PyPDF2, urllib2
+import requests, bs4, sys, webbrowser, html2text, os , PyPDF2, urllib2, smtplib
 
 # encoding=utf8
 # the html file written by beautifulsoup4 wasnt getting parsed by html2text.
 #So converted it to default utf8 encoding
 
-import sys
 
 #uncomment these 2 lines of code if you get the below error. Some unicode encoding stuff
 #UnicodeEncodeError: 'ascii' codec can't encode character u'\ufeff' in position 0: ordinal not in range(128)
@@ -40,6 +39,27 @@ queryStringStub='http://tucson.craigslist.org/search/cto?sort=priceasc&min_price
 numberOfGoogleResults=1000
 startValue=1
 stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
+gmailUsername="mithunpaul08@gmail.com"
+gmailPwd="Alohomora5"
+fromaddr="mithunpaul08@gmail.com"
+toaddrs="mithunpaul08@gmail.com"
+
+def sendEmail(messageToSEnd):
+    msg = "\r\n".join([
+        "From: user_me@gmail.com",
+        "To: user_you@gmail.com",
+        "Subject: Just a message",
+        "",
+        "Why, oh why"
+    ])
+    server = smtplib.SMTP('smtp.gmail.com:587')
+    server.ehlo()
+    server.starttls()
+    server.login(gmailUsername, gmailPwd)
+    server.sendmail(fromaddr, toaddrs, msg)
+    server.quit()
+    print("done sending email")
+
 def my_range(start, end, step):
     while start <= end:
         yield start
@@ -118,119 +138,13 @@ def parseGResults(myQS):
                                         print individualCarDetails
                                         listOfCars.append(individualCarDetails)
 
-        print str(listOfCars)
-                         # Extract the details you want. add it to a global buffer or something
-                        #get
-       # else:
-         #       print "no class"
-            #print "found a title and its hyperlink value is" + res;
-
-
-        # get all the hyperlinks in the given page.
-        #linkElems = soup.findAll("a")
-
-
+        finalListOfCars=str(listOfCars)
+        sendEmail(finalListOfCars)
     except:
-        print "exception occured"+ sys.exc_info()[0]
-
-    else:
-        print "finished"
-        sys.exit(1)
-       # soup = bs4.BeautifulSoup(res.text,"lxml")
-        #linkElems = soup.select('.r a')
-        #writeToOutputFile(linkElems)
-        #get the length of the total number of links
-        numOpen = len(linkElems)
-        print 'value of  numOpen is ' + `numOpen`
-        #sys.exit(1)
-        for i in range(numOpen):
-            try:
-                #find if href has .pdf in it
-                #filenameCounter=i+startValue
-                print linkElems[i]
-                sys.exit(1)
-                classResult = linkElems[i].get('class')
-                if ("result-title" in classResult):
-                    #res = requests.get(linkElems[i].get('href'))
-                    print "found a title and its hyperlink value is" + res;
-                else:
-                    continue;
-                try:
-                    res = requests.get(linkElems[i].get('href'))
-                    res.raise_for_status()
-                except:
-                    print "exception occured"
-                          #+ `e.response.status_code`
+        print('generic exception: ' + traceback.format_exc())
 
 
-                else:
-                    #create a unique file name to store each of the results
-                    combinedFileName=stubFilename +`filenameCounter`
-                    waterResultFile = open(combinedFileName, 'wb+')
-                    for chunk in res.iter_content(100000):
-                        waterResultFile.write(chunk)
-                    waterResultFile.close()
-                    hrefValue=linkElems[i].get('href')
 
-                    if(hrefValue.find('.pdf')>0):
-                        print 'file number ' + `filenameCounter`+  ' is a pdf file'
-                        os.rename(combinedFileName,combinedFileName+'.pdf')
-                        pdfFileObj = open(combinedFileName+'.pdf', 'rb')
-                        pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-                        pageObj = pdfReader.getPage(0)
-                        extractedText=pageObj.extractText()
-
-                        for i in xrange(pdfReader.getNumPages()):
-                            pageObj = pdfReader.getPage(i)
-                            extractedText=extractedText+pageObj.extractText()
-
-                        #remove the file if it already exists
-                        try:
-                            os.remove(combinedFileName+'InTxtFormat.txt')
-                        except OSError:
-                            pass
-
-                        #write the extracted text from pdf document to a txt file
-                        target = open(combinedFileName+'InTxtFormat.txt', 'w')
-                        target.write(extractedText)
-                        target.close()
-                    else:
-                        #if file is html or txt
-                        print'file number ' + `filenameCounter`+  ' is not a pdf file'
-
-                        #get the unicode converted file and rename it as html
-                        os.rename(combinedFileName,combinedFileName+'.html')
-
-                        #read into an html handle
-                        #myhtml = open(outputDirectory+combinedFileName+".html").read()
-                        myhtml = open(combinedFileName+".html").read()
-
-                        #remove the file if it already exists
-                        try:
-                            #os.remove(outputDirectory+combinedFileName+'InTxtFormat.txt')
-                            os.remove(combinedFileName+'InTxtFormat.txt')
-                        except OSError:
-                            pass
-
-                        #ignore links
-                        h = html2text.HTML2Text()
-                        h.ignore_links = True
-
-                        convertedText=h.handle(myhtml.encode('utf-8').strip())
-
-                        # #write the converted text to a txt file
-                        #target = open(outputDirectory+combinedFileName+'InTxtFormat.txt', 'w')
-                        target = open(combinedFileName+'InTxtFormat.txt', 'w')
-                        target.write(html2text.html2text(convertedText).encode('utf-8'))
-                        target.close()
-            except:
-                print "Exception occured in the entire function"
-                continue
-
-
-            #see if you can raise more than 10 google results
-#for gCounter in my_range (startValue,numberOfGoogleResults,10):
-#start =gCounter
 
 queryString=queryStringStub
 parseGResults(queryString)
