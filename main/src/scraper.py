@@ -46,10 +46,10 @@ gmailUsername="mithunpaul08@gmail.com"
 gmailPwd="Alohomora5"
 fromaddr="mithunpaul08@gmail.com"
 #toaddrs="nithinitzme@gmail.com"
-toaddr="nn7607@gmail.com"
-subjectForEmail= "Details of the used cars in tucson you asked for"
-carbonCopy = "mithunpaul08@gmail.com"
-bodyOfEmail="Hi,\n These are details used for this query are:\n"
+toaddr="mithunpaul08@gmail.com"
+subjectForEmail= "Details of the used cars in tucson/phoenix area you asked for"
+carbonCopy = "nn7607@gmail.com"
+bodyOfEmail="Hi,\n These are the parameters used for this query:\n"
 
 class myCar:
     min_price = ""
@@ -192,23 +192,46 @@ def parseGResults(myQS):
 
                                     listOfSpanValues = []
                                     carAttributes="";
+                                # < span
+                                # id = "titletextonly" > 2004
+                                # Honda
+                                # Accord
+                                # LX < / span >
+                                # - < span
+                                #
+                                # class ="price" > $2850 < / span >
+                                individualCarDetails = ""
 
-                                    myDivTags=childSoup.find_all("div", {"class": "mapAndAttrs"})
-                                    for individualDivs in myDivTags:
-                                        if(len(individualDivs.find_all('span'))!=0):
-                                            for spanElements in individualDivs.find_all('span'):
-                                                mySpanElementText=str(spanElements.text)
-                                                #print spanElements.text
-                                                #carAttributes= carAttributes+mySpanElementText
-                                                listOfSpanValues.append(mySpanElementText)
-                                            #carAttributes=String.join(listOfSpanValues, '')
-                                            #print carAttributes
-                                            individualCarDetails=str(listOfSpanValues)
-                                            print individualCarDetails
-                                            print childurl
-                                            urlToThisCar="Link To This Car:"+childurl
-                                            listOfCars.append(individualCarDetails)
-                                            listOfCars.append(str(urlToThisCar))
+                                carTitleSpan = childSoup.find("span", {"id": "titletextonly"})
+                                if(carTitleSpan!=None):
+                                    carTitle = "Name:"+carTitleSpan.text+"\n"
+                                    individualCarDetails+=carTitle
+
+
+                                carPriceSpan = childSoup.find("span", {"class": "price"})
+                                if (carPriceSpan != None):
+                                    carPrice= "Price:"+carPriceSpan.text+"\n"
+                                    individualCarDetails+=carPrice
+
+
+                                myDivTags=childSoup.find_all("div", {"class": "mapAndAttrs"})
+                                for individualDivs in myDivTags:
+                                    if(len(individualDivs.find_all('span'))!=0):
+                                        for spanElements in individualDivs.find_all('span'):
+                                            mySpanElementText=str(spanElements.text)
+                                            #print spanElements.text
+                                            #carAttributes= carAttributes+mySpanElementText
+                                            listOfSpanValues.append(mySpanElementText)
+                                        #carAttributes=String.join(listOfSpanValues, '')
+                                        #print carAttributes
+                                        individualCarDetails=individualCarDetails+str(listOfSpanValues)
+                                        #print individualCarDetails
+                                        #print childurl
+                                        #print individualCarDetails
+                                        #sys.exit(1)
+                                        urlToThisCar="Link To This Car:"+childurl
+                                        listOfCars.append(individualCarDetails)
+                                        listOfCars.append(str(urlToThisCar))
 
             finalListOfCars = "\n\n".join(listOfCars)
             sendEmail(finalListOfCars,carObjectToBuildQuery)
