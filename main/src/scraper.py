@@ -63,6 +63,8 @@ def parseGResults(myQS):
         content = url.read()
         #parse the content into a format that soup understands
         soup = bs4.BeautifulSoup(content,"lxml")
+
+        #for each of the hyperlinks in the page
         for link in soup.find_all('a'):
             # get class of the link. In craigslist result, actual hyperlinks of results are in the :class="result-title hdrlnk"
             classResult = link.get('class')
@@ -79,16 +81,23 @@ def parseGResults(myQS):
                         content = url.read()
                         # parse the content into a format that soup understands
                         childSoup = bs4.BeautifulSoup(content, "lxml")
-                        print childSoup
-                        print "done child data"
-                        #writeToOutputFile(childSoup.tost)
+                        #print childSoup
+                        #print "done child data"
+
+                        #to find the attributes of the car, which is inside <div class="mapAndAttrs">
+
+                        #find all div tags
+                        myDivTags=childSoup.find_all("div", {"class": "mapAndAttrs"})
+                        for individualDivs in myDivTags:
+                            if(len(individualDivs.find_all('span'))!=0):
+                                for spanElements in individualDivs.find_all('span'):
+                                    print spanElements.text
+
+
                          # Extract the details you want. add it to a global buffer or something
                         #get
-
-
         else:
                 print "no class"
-
             #print "found a title and its hyperlink value is" + res;
 
 
@@ -98,8 +107,10 @@ def parseGResults(myQS):
 
     except e:
         print "exception occured"
-        sys.exit(1)
+
     else:
+        print "finished"
+        sys.exit(1)
        # soup = bs4.BeautifulSoup(res.text,"lxml")
         #linkElems = soup.select('.r a')
         #writeToOutputFile(linkElems)
