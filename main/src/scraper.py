@@ -43,14 +43,15 @@ gmailUsername="mithunpaul08@gmail.com"
 gmailPwd="Alohomora5"
 fromaddr="mithunpaul08@gmail.com"
 toaddrs="mithunpaul08@gmail.com"
+subjectForEmail= "details of cars in tucson you asked for"
 
 def sendEmail(messageToSEnd):
     msg = "\r\n".join([
-        "From: user_me@gmail.com",
-        "To: user_you@gmail.com",
-        "Subject: Just a message",
+        "From: "+fromaddr,
+        "To: "+toaddrs,
+        "Subject:"+subjectForEmail,
         "",
-        "Why, oh why"
+        messageToSEnd
     ])
     server = smtplib.SMTP('smtp.gmail.com:587')
     server.ehlo()
@@ -138,10 +139,11 @@ def parseGResults(myQS):
                                         print individualCarDetails
                                         listOfCars.append(individualCarDetails)
 
-        finalListOfCars=str(listOfCars)
+        #finalListOfCars=str(listOfCars)
+        finalListOfCars = "\n\n".join(listOfCars)
         sendEmail(finalListOfCars)
     except:
-        print('generic exception: ' + traceback.format_exc())
+        print('generic exception: ')
 
 
 
