@@ -35,7 +35,8 @@ os.chdir('../../outputs/')
 #				https://www.google.com/search?q=%22pests+diseases%22+tamil+nadu+agriculture+&start=41&num=10
 
 stubFilename='rawOutputs'
-queryStringStub='http://tucson.craigslist.org/search/cto?sort=priceasc&min_price=1&max_price=6000&auto_make_model=honda+%7C+toyota&min_auto_year=2001&max_auto_year=2016&min_auto_miles=300&max_auto_miles=110000&auto_title_status=1'
+queryStringStubForTucson='http://tucson.craigslist.org/search/cto?'
+actualQueryString='http://tucson.craigslist.org/search/cto?sort=priceasc&min_price=1&max_price=6000&auto_make_model=honda+%7C+toyota&min_auto_year=2001&max_auto_year=2016&min_auto_miles=300&max_auto_miles=110000&auto_title_status=1'
 numberOfGoogleResults=1000
 startValue=1
 stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
@@ -44,11 +45,50 @@ gmailPwd="Alohomora5"
 fromaddr="mithunpaul08@gmail.com"
 toaddrs="mithunpaul08@gmail.com"
 subjectForEmail= "details of cars in tucson you asked for"
+cc = ['nn7607@gmail.com']
+
+
+class myCar:
+    min_price = ""
+    max_price =""
+    auto_make_model=""
+    min_auto_year=""
+    max_auto_year=""
+    min_auto_miles=''
+    max_auto_miles=''
+    auto_title_status=''
+
+
+#"Search Query attributes used to build the query string"
+def fillSearchQueryAttributes(queryCar):
+    queryCar.min_price = "1"
+    queryCar.max_price ="6000"
+    queryCar.auto_make_model="honda+%7C+toyota"
+    queryCar.min_auto_year="2001"
+    queryCar.max_auto_year="2016"
+    queryCar.min_auto_miles='300'
+    queryCar.max_auto_miles='110000'
+    queryCar.auto_title_status='1'
+
+def createQueryObject(queryStringStubToBuild, carObject):
+    queryStringToSearch = "'"+str(queryStringStubToBuild)+"sort=priceasc&min_price="+carObject.min_price+\
+                          "&max_price="+carObject.max_price+\
+                          "&auto_make_model="+carObject.auto_make_model+\
+                            "&min_auto_year="+carObject.min_auto_year+\
+                                             "&max_auto_year="+carObject.max_auto_year+\
+                                             "&min_auto_miles="+carObject.min_auto_miles+\
+                                             "&max_auto_miles="+carObject.max_auto_miles+\
+                                             "&auto_title_status="+carObject.auto_title_status+"'"
+    print queryStringToSearch
+    print actualQueryString
+    sys.exit(1)
+    return queryStringToSearch
 
 def sendEmail(messageToSEnd):
     msg = "\r\n".join([
         "From: "+fromaddr,
         "To: "+toaddrs,
+        "CC: %s\r\n" % ",".join(cc),
         "Subject:"+subjectForEmail,
         "",
         messageToSEnd
@@ -60,11 +100,6 @@ def sendEmail(messageToSEnd):
     server.sendmail(fromaddr, toaddrs, msg)
     server.quit()
     print("done sending email")
-
-def my_range(start, end, step):
-    while start <= end:
-        yield start
-        start += step
 
 
 def writeToOutputFile(textToWrite):
@@ -79,6 +114,10 @@ def writeToOutputFile(textToWrite):
 
 def parseGResults(myQS):
     try:
+
+        carObjectToBuildQuery = myCar()
+        fillSearchQueryAttributes(carObjectToBuildQuery)
+        queryStringToSearch=createQueryObject(queryStringStubForTucson,carObjectToBuildQuery)
         #urrlib2 is a version of beautiful soup that raises a http request for you
         url = urllib2.urlopen(myQS)
         content = url.read()
@@ -138,7 +177,7 @@ def parseGResults(myQS):
                                         individualCarDetails=str(listOfSpanValues)
                                         print individualCarDetails
                                         print childurl
-                                        urlToThisCar="urlToThisCar:"+childurl
+                                        urlToThisCar="Link To This Car:"+childurl
                                         listOfCars.append(individualCarDetails)
                                         listOfCars.append(str(urlToThisCar))
 
@@ -150,6 +189,5 @@ def parseGResults(myQS):
 
 
 
-queryString=queryStringStub
-parseGResults(queryString)
+parseGResults(actualQueryString)
  
