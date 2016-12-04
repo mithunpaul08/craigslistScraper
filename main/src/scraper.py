@@ -41,6 +41,7 @@ actualQueryString='http://tucson.craigslist.org/search/cto?sort=priceasc&min_pri
 numberOfGoogleResults=1000
 startValue=1
 stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
+stubUrlForPhxCLInnerpages='http://phoenix.craigslist.org/'
 gmailUsername="mithunpaul08@gmail.com"
 gmailPwd="Alohomora5"
 fromaddr="mithunpaul08@gmail.com"
@@ -89,16 +90,6 @@ def sendEmail(queryResults,carObject):
     bodyWithQueryDetailsreplacedAmbersand=bodyWithQueryDetails.replace("&", "\n")
     finalMessageToSend=bodyWithQueryDetailsreplacedAmbersand+"\n \nAnd the results are as follows:\n\n"+queryResults
     print("getting here at 32423")
-    #trying out mime version
-    # msg = MIMEMultipart()
-    # msg['From'] = fromaddr
-    # msg['To'] = toaddr
-    # msg['Cc'] = carbonCopy
-    # msg['Subject'] = subjectForEmail
-    # body = finalMessageToSend
-    # msg.attach(MIMEText(body, 'plain'))
-
-    #
 
     msg = "\r\n".join([
         "From: "+fromaddr,
@@ -114,9 +105,9 @@ def sendEmail(queryResults,carObject):
     server.ehlo()
     server.starttls()
     server.login(gmailUsername, gmailPwd)
-    print(fromaddr)
-    print(toaddr)
-    print(msg)
+    #print(fromaddr)
+    #print(toaddr)
+    #print(msg)
     server.sendmail(fromaddr, toaddr, msg)
     server.quit()
     print("done sending email")
@@ -170,8 +161,11 @@ def parseGResults(myQS):
                         linkToNextPage = link.get('href')
                         if (linkToNextPage != None):
                             print("\n")
+                            childurl = stubUrlForTucsonCLInnerpages + linkToNextPage
                             #print(linkToNextPage)
-                            childurl=stubUrlForTucsonCLInnerpages+linkToNextPage
+                            if("phoenix" in linkToNextPage):
+                                childurl = "http:" + linkToNextPage
+
                             #once you get the link, open and go into that page.
                             try:
                                 secondChildurl = urllib2.urlopen(childurl)
