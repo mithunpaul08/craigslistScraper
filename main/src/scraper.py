@@ -44,9 +44,9 @@ gmailUsername="mithunpaul08@gmail.com"
 gmailPwd="Alohomora5"
 fromaddr="mithunpaul08@gmail.com"
 toaddrs="mithunpaul08@gmail.com"
-subjectForEmail= "details of cars in tucson you asked for"
-cc = ['nn7607@gmail.com']
-
+subjectForEmail= "Details of used cars in tucson you asked for"
+carbonCopy = 'nn7607@gmail.com'
+bodyOfEmail="Hi, the details used for this query are"
 
 class myCar:
     min_price = ""
@@ -57,6 +57,7 @@ class myCar:
     min_auto_miles=''
     max_auto_miles=''
     auto_title_status=''
+
 
 
 #"Search Query attributes used to build the query string"
@@ -71,35 +72,45 @@ def fillSearchQueryAttributes(queryCar):
     queryCar.auto_title_status='1'
 
 def createQueryObject(queryStringStubToBuild, carObject):
-    queryStringToSearch = "'"+str(queryStringStubToBuild)+"sort=priceasc&min_price="+carObject.min_price+\
+    queryStringToSearch = str(queryStringStubToBuild)+"sort=priceasc&min_price="+carObject.min_price+\
                           "&max_price="+carObject.max_price+\
                           "&auto_make_model="+carObject.auto_make_model+\
                             "&min_auto_year="+carObject.min_auto_year+\
                                              "&max_auto_year="+carObject.max_auto_year+\
                                              "&min_auto_miles="+carObject.min_auto_miles+\
                                              "&max_auto_miles="+carObject.max_auto_miles+\
-                                             "&auto_title_status="+carObject.auto_title_status+"'"
+                                             "&auto_title_status="+carObject.auto_title_status
+
     print queryStringToSearch
-    print actualQueryString
-    sys.exit(1)
     return queryStringToSearch
 
-def sendEmail(messageToSEnd):
+def sendEmail(queryResults,carObject):
+    print "entering sendEmail Function"
+    print queryResults;
+    bodyWithQueryDetails=createQueryObject(bodyOfEmail,carObject);
+    print bodyWithQueryDetails
+    finalMessageToSend=bodyWithQueryDetails+"and the results are as follows:"+queryResults
+    print finalMessageToSend
+
     msg = "\r\n".join([
         "From: "+fromaddr,
         "To: "+toaddrs,
-        "CC: %s\r\n" % ",".join(cc),
         "Subject:"+subjectForEmail,
         "",
-        messageToSEnd
+        finalMessageToSend
     ])
+
     server = smtplib.SMTP('smtp.gmail.com:587')
     server.ehlo()
     server.starttls()
     server.login(gmailUsername, gmailPwd)
-    server.sendmail(fromaddr, toaddrs, msg)
+    server.sendmail(fromaddr, toaddrs, finalMessageToSend)
     server.quit()
     print("done sending email")
+
+def buildMessageBody(carObjectToBuildQuery):
+    bodyOfEmail = "Hi, the details used for this query are as follows:"+carObjectToBuildQuery
+
 
 
 def writeToOutputFile(textToWrite):
@@ -119,70 +130,81 @@ def parseGResults(myQS):
         fillSearchQueryAttributes(carObjectToBuildQuery)
         queryStringToSearch=createQueryObject(queryStringStubForTucson,carObjectToBuildQuery)
         #urrlib2 is a version of beautiful soup that raises a http request for you
-        url = urllib2.urlopen(myQS)
-        content = url.read()
-        #parse the content into a format that soup understands
-        soup = bs4.BeautifulSoup(content,"lxml")
-        listOfCars = []
-        #for each of the hyperlinks in the page
-        for link in soup.find_all('a'):
-            # get class of the link. In craigslist result, actual hyperlinks of results are in the :class="result-title hdrlnk"
-            classResult = link.get('class')
-            if (classResult != None):
-                if ("result-title" in classResult):
-                    #print(link.get('class'))
-                    #if the class exists, get the link, if its not null
-                    linkToNextPage = link.get('href')
-                    if (linkToNextPage != None):
-                        print("\n")
-                        #print(linkToNextPage)
-                        childurl=stubUrlForTucsonCLInnerpages+linkToNextPage
-                        #once you get the link, open and go into that page.
-                        try:
-                            secondChildurl = urllib2.urlopen(childurl)
-                        except urllib2.HTTPError, e:
-                            print('HTTPError = ' + str(e.code))
-                        except urllib2.URLError, e:
-                            print('URLError = ' + str(e.reason))
-                        except httplib.HTTPException, e:
-                            print('HTTPException')
-                        except Exception:
-                            import traceback
-                            print('generic exception: ' + traceback.format_exc())
-                        else:
-                            content = secondChildurl.read()
-                            if(content != None):
-                            # parse the content into a format that soup understands
-                                childSoup = bs4.BeautifulSoup(content, "lxml")
-                                #print childSoup
-                                #print "done child data"
+        try:
+            url = urllib2.urlopen(queryStringToSearch)
+        except urllib2.HTTPError, e:
+            print('HTTPError = ' + str(e.code))
+        except urllib2.URLError, e:
+            print('URLError = ' + str(e.reason))
+        except httplib.HTTPException, e:
+            print('HTTPException')
+        except Exception:
+            import traceback
+            print('generic exception: ' + traceback.format_exc())
+        else:
+            content = url.read()
+            #parse the content into a format that soup understands
+            soup = bs4.BeautifulSoup(content,"lxml")
+            listOfCars = []
+            #for each of the hyperlinks in the page
+            for link in soup.find_all('a'):
+                # get class of the link. In craigslist result, actual hyperlinks of results are in the :class="result-title hdrlnk"
+                classResult = link.get('class')
+                if (classResult != None):
+                    if ("result-title" in classResult):
+                        #print(link.get('class'))
+                        #if the class exists, get the link, if its not null
+                        linkToNextPage = link.get('href')
+                        if (linkToNextPage != None):
+                            print("\n")
+                            #print(linkToNextPage)
+                            childurl=stubUrlForTucsonCLInnerpages+linkToNextPage
+                            #once you get the link, open and go into that page.
+                            try:
+                                secondChildurl = urllib2.urlopen(childurl)
+                            except urllib2.HTTPError, e:
+                                print('HTTPError = ' + str(e.code))
+                            except urllib2.URLError, e:
+                                print('URLError = ' + str(e.reason))
+                            except httplib.HTTPException, e:
+                                print('HTTPException')
+                            except Exception:
+                                import traceback
+                                print('generic exception: ' + traceback.format_exc())
+                            else:
+                                content = secondChildurl.read()
+                                if(content != None):
+                                # parse the content into a format that soup understands
+                                    childSoup = bs4.BeautifulSoup(content, "lxml")
+                                    #print childSoup
+                                    #print "done child data"
 
-                                #to find the attributes of the car, which is inside <div class="mapAndAttrs">
+                                    #to find the attributes of the car, which is inside <div class="mapAndAttrs">
 
-                                #find all div tags
+                                    #find all div tags
 
-                                listOfSpanValues = []
-                                carAttributes="";
+                                    listOfSpanValues = []
+                                    carAttributes="";
 
-                                myDivTags=childSoup.find_all("div", {"class": "mapAndAttrs"})
-                                for individualDivs in myDivTags:
-                                    if(len(individualDivs.find_all('span'))!=0):
-                                        for spanElements in individualDivs.find_all('span'):
-                                            mySpanElementText=str(spanElements.text)
-                                            #print spanElements.text
-                                            #carAttributes= carAttributes+mySpanElementText
-                                            listOfSpanValues.append(mySpanElementText)
-                                        #carAttributes=String.join(listOfSpanValues, '')
-                                        #print carAttributes
-                                        individualCarDetails=str(listOfSpanValues)
-                                        print individualCarDetails
-                                        print childurl
-                                        urlToThisCar="Link To This Car:"+childurl
-                                        listOfCars.append(individualCarDetails)
-                                        listOfCars.append(str(urlToThisCar))
+                                    myDivTags=childSoup.find_all("div", {"class": "mapAndAttrs"})
+                                    for individualDivs in myDivTags:
+                                        if(len(individualDivs.find_all('span'))!=0):
+                                            for spanElements in individualDivs.find_all('span'):
+                                                mySpanElementText=str(spanElements.text)
+                                                #print spanElements.text
+                                                #carAttributes= carAttributes+mySpanElementText
+                                                listOfSpanValues.append(mySpanElementText)
+                                            #carAttributes=String.join(listOfSpanValues, '')
+                                            #print carAttributes
+                                            individualCarDetails=str(listOfSpanValues)
+                                            print individualCarDetails
+                                            print childurl
+                                            urlToThisCar="Link To This Car:"+childurl
+                                            listOfCars.append(individualCarDetails)
+                                            listOfCars.append(str(urlToThisCar))
 
-        finalListOfCars = "\n\n".join(listOfCars)
-        sendEmail(finalListOfCars)
+            finalListOfCars = "\n\n".join(listOfCars)
+            sendEmail(str(finalListOfCars),carObjectToBuildQuery)
     except:
         print('generic exception: ')
 
