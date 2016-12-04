@@ -42,13 +42,13 @@ numberOfGoogleResults=1000
 startValue=1
 stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
 stubUrlForPhxCLInnerpages='http://phoenix.craigslist.org/'
-gmailUsername="mithunpaul08@gmail.com"
-gmailPwd="Alohomora5"
-fromaddr="mithunpaul08@gmail.com"
-toaddrs="nithinitzme@gmail.com"
+gmailUsername="saf@gmail.com"
+gmailPwd="sfasd"
+fromaddr="adf@gmail.com"
+toaddrs="asdf@gmail.com"
 #toaddr="mithunpaul08@gmail.com"
 subjectForEmail= "Details of the used cars in tucson/phoenix area you asked for"
-carbonCopy = "nn7607@gmail.com"
+carbonCopy = "asfa@gmail.com"
 bodyOfEmail="Hi,\n These are the parameters used for this query:\n\n"
 
 class myCar:
