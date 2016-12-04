@@ -63,7 +63,7 @@ def parseGResults(myQS):
         content = url.read()
         #parse the content into a format that soup understands
         soup = bs4.BeautifulSoup(content,"lxml")
-
+        listOfCars = []
         #for each of the hyperlinks in the page
         for link in soup.find_all('a'):
             # get class of the link. In craigslist result, actual hyperlinks of results are in the :class="result-title hdrlnk"
@@ -74,30 +74,55 @@ def parseGResults(myQS):
                     #if the class exists, get the link, if its not null
                     linkToNextPage = link.get('href')
                     if (linkToNextPage != None):
-                        print(linkToNextPage)
+                        print("\n")
+                        #print(linkToNextPage)
                         childurl=stubUrlForTucsonCLInnerpages+linkToNextPage
                         #once you get the link, open and go into that page.
-                        url = urllib2.urlopen(childurl)
-                        content = url.read()
-                        # parse the content into a format that soup understands
-                        childSoup = bs4.BeautifulSoup(content, "lxml")
-                        #print childSoup
-                        #print "done child data"
+                        try:
+                            url = urllib2.urlopen(childurl)
+                        except urllib2.HTTPError, e:
+                            print('HTTPError = ' + str(e.code))
+                        except urllib2.URLError, e:
+                            print('URLError = ' + str(e.reason))
+                        except httplib.HTTPException, e:
+                            print('HTTPException')
+                        except Exception:
+                            import traceback
+                            print('generic exception: ' + traceback.format_exc())
+                        else:
+                            content = url.read()
+                            if(content != None):
+                            # parse the content into a format that soup understands
+                                childSoup = bs4.BeautifulSoup(content, "lxml")
+                                #print childSoup
+                                #print "done child data"
 
-                        #to find the attributes of the car, which is inside <div class="mapAndAttrs">
+                                #to find the attributes of the car, which is inside <div class="mapAndAttrs">
 
-                        #find all div tags
-                        myDivTags=childSoup.find_all("div", {"class": "mapAndAttrs"})
-                        for individualDivs in myDivTags:
-                            if(len(individualDivs.find_all('span'))!=0):
-                                for spanElements in individualDivs.find_all('span'):
-                                    print spanElements.text
+                                #find all div tags
 
+                                listOfSpanValues = []
+                                carAttributes="";
 
+                                myDivTags=childSoup.find_all("div", {"class": "mapAndAttrs"})
+                                for individualDivs in myDivTags:
+                                    if(len(individualDivs.find_all('span'))!=0):
+                                        for spanElements in individualDivs.find_all('span'):
+                                            mySpanElementText=str(spanElements.text)
+                                            #print spanElements.text
+                                            #carAttributes= carAttributes+mySpanElementText
+                                            listOfSpanValues.append(mySpanElementText)
+                                        #carAttributes=String.join(listOfSpanValues, '')
+                                        #print carAttributes
+                                        individualCarDetails=str(listOfSpanValues)
+                                        print individualCarDetails
+                                        listOfCars.append(individualCarDetails)
+
+        print str(listOfCars)
                          # Extract the details you want. add it to a global buffer or something
                         #get
-        else:
-                print "no class"
+       # else:
+         #       print "no class"
             #print "found a title and its hyperlink value is" + res;
 
 
@@ -105,8 +130,8 @@ def parseGResults(myQS):
         #linkElems = soup.findAll("a")
 
 
-    except e:
-        print "exception occured"
+    except:
+        print "exception occured"+ sys.exc_info()[0]
 
     else:
         print "finished"
