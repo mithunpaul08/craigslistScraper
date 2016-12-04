@@ -8,7 +8,8 @@
 #5. create a folder structure
 
 import requests, bs4, sys, webbrowser, html2text, os , PyPDF2, urllib2, smtplib
-
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
 # encoding=utf8
 # the html file written by beautifulsoup4 wasnt getting parsed by html2text.
 #So converted it to default utf8 encoding
@@ -43,10 +44,11 @@ stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
 gmailUsername="mithunpaul08@gmail.com"
 gmailPwd="Alohomora5"
 fromaddr="mithunpaul08@gmail.com"
-toaddrs="mithunpaul08@gmail.com"
-subjectForEmail= "Details of used cars in tucson you asked for"
-carbonCopy = "nn7607@gmail.com"
-bodyOfEmail="Hi, the details used for this query are:\n"
+#toaddrs="nithinitzme@gmail.com"
+toaddr="nn7607@gmail.com"
+subjectForEmail= "Details of the used cars in tucson you asked for"
+carbonCopy = "mithunpaul08@gmail.com"
+bodyOfEmail="Hi,\n These are details used for this query are:\n"
 
 class myCar:
     min_price = ""
@@ -65,7 +67,7 @@ def fillSearchQueryAttributes(queryCar):
     queryCar.min_price = "1"
     queryCar.max_price ="6000"
     queryCar.auto_make_model="honda+%7C+toyota"
-    queryCar.min_auto_year="2001"
+    queryCar.min_auto_year="2005"
     queryCar.max_auto_year="2016"
     queryCar.min_auto_miles='300'
     queryCar.max_auto_miles='110000'
@@ -80,29 +82,42 @@ def createQueryObject(queryStringStubToBuild, carObject):
                                              "&min_auto_miles="+carObject.min_auto_miles+\
                                              "&max_auto_miles="+carObject.max_auto_miles+\
                                              "&auto_title_status="+carObject.auto_title_status
-
-    print queryStringToSearch
     return queryStringToSearch
 
 def sendEmail(queryResults,carObject):
     bodyWithQueryDetails=createQueryObject(bodyOfEmail,carObject);
     bodyWithQueryDetailsreplacedAmbersand=bodyWithQueryDetails.replace("&", "\n")
     finalMessageToSend=bodyWithQueryDetailsreplacedAmbersand+"\n \nAnd the results are as follows:\n\n"+queryResults
+    print("getting here at 32423")
+    #trying out mime version
+    # msg = MIMEMultipart()
+    # msg['From'] = fromaddr
+    # msg['To'] = toaddr
+    # msg['Cc'] = carbonCopy
+    # msg['Subject'] = subjectForEmail
+    # body = finalMessageToSend
+    # msg.attach(MIMEText(body, 'plain'))
+
+    #
 
     msg = "\r\n".join([
         "From: "+fromaddr,
-        "To: "+toaddrs,
-        "CC: " + carbonCopy,
+        "To: " + toaddr,
+        "Cc: " + carbonCopy,
         "Subject:"+subjectForEmail,
         "",
         finalMessageToSend
     ])
 
     server = smtplib.SMTP('smtp.gmail.com:587')
+    #server = smtplib.SMTP('smtp.gmail.com', 587)
     server.ehlo()
     server.starttls()
     server.login(gmailUsername, gmailPwd)
-    server.sendmail(fromaddr, toaddrs, msg)
+    print(fromaddr)
+    print(toaddr)
+    print(msg)
+    server.sendmail(fromaddr, toaddr, msg)
     server.quit()
     print("done sending email")
 
@@ -205,6 +220,7 @@ def parseGResults(myQS):
             sendEmail(finalListOfCars,carObjectToBuildQuery)
     except:
         print('generic exception: ')
+        #+sys.exc_info()[0])
 
 
 
