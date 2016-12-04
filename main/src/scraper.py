@@ -7,13 +7,16 @@
 #4. convert the pdf files into txt and save them---done
 #5. create a folder structure
 
-import requests, bs4, sys, webbrowser, html2text, os , PyPDF2
+import requests, bs4, sys, webbrowser, html2text, os , PyPDF2, urllib2
 
 # encoding=utf8
 # the html file written by beautifulsoup4 wasnt getting parsed by html2text.
 #So converted it to default utf8 encoding
 
 import sys
+
+#uncomment these 2 lines of code if you get the below error. Some unicode encoding stuff
+#UnicodeEncodeError: 'ascii' codec can't encode character u'\ufeff' in position 0: ordinal not in range(128)
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -32,41 +35,96 @@ os.chdir('../../outputs/')
 #ideal query:res = requests.get('https://www.google.com/search?q=%22farm+size%22+tamil+nadu+agriculture+&start=1&num=10')
 #				https://www.google.com/search?q=%22pests+diseases%22+tamil+nadu+agriculture+&start=41&num=10
 
-stubFilename='pestsDiseases'
-queryStringStub='http://www.google.com/search?q=pests+diseases+tamil+nadu+agriculture'
+stubFilename='rawOutputs'
+queryStringStub='http://tucson.craigslist.org/search/cto?sort=priceasc&min_price=1&max_price=6000&auto_make_model=honda+%7C+toyota&min_auto_year=2001&max_auto_year=2016&min_auto_miles=300&max_auto_miles=110000&auto_title_status=1'
 numberOfGoogleResults=1000
 startValue=1
-
+stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
 def my_range(start, end, step):
     while start <= end:
         yield start
         start += step
 
 
-def parseGResults(myQS,startValue):
+def writeToOutputFile(textToWrite):
+     # #write the converted text to a txt file
+    #target = open(outputDirectory+combinedFileName+'InTxtFormat.txt', 'w')
+    target = open(stubFilename+'.txt', 'w')
+     #if you get this error: TypeError: expected a character buffer object
+    target.write(html2text.html2text(textToWrite).encode('utf-8'))
+    #target.write(textToWrite)
+    target.close()
 
-    print "value of query string is:"+ myQS
+
+def parseGResults(myQS):
     try:
-        res = requests.get(myQS)
-        res.raise_for_status()
+        #urrlib2 is a version of beautiful soup that raises a http request for you
+        url = urllib2.urlopen(myQS)
+        content = url.read()
+        #parse the content into a format that soup understands
+        soup = bs4.BeautifulSoup(content,"lxml")
+        for link in soup.find_all('a'):
+            # get class of the link. In craigslist result, actual hyperlinks of results are in the :class="result-title hdrlnk"
+            classResult = link.get('class')
+            if (classResult != None):
+                if ("result-title" in classResult):
+                    #print(link.get('class'))
+                    #if the class exists, get the link, if its not null
+                    linkToNextPage = link.get('href')
+                    if (linkToNextPage != None):
+                        print(linkToNextPage)
+                        childurl=stubUrlForTucsonCLInnerpages+linkToNextPage
+                        #once you get the link, open and go into that page.
+                        url = urllib2.urlopen(childurl)
+                        content = url.read()
+                        # parse the content into a format that soup understands
+                        childSoup = bs4.BeautifulSoup(content, "lxml")
+                        print childSoup
+                        print "done child data"
+                        #writeToOutputFile(childSoup.tost)
+                         # Extract the details you want. add it to a global buffer or something
+                        #get
 
-    except requests.HTTPError, e:
-        print "exception occured"+ `e.response.status_code`
+
+        else:
+                print "no class"
+
+            #print "found a title and its hyperlink value is" + res;
+
+
+        # get all the hyperlinks in the given page.
+        #linkElems = soup.findAll("a")
+
+
+    except e:
+        print "exception occured"
+        sys.exit(1)
     else:
-        soup = bs4.BeautifulSoup(res.text,"lxml")
-        linkElems = soup.select('.r a')
-        numOpen = min(numberOfGoogleResults, len(linkElems))
+       # soup = bs4.BeautifulSoup(res.text,"lxml")
+        #linkElems = soup.select('.r a')
+        #writeToOutputFile(linkElems)
+        #get the length of the total number of links
+        numOpen = len(linkElems)
         print 'value of  numOpen is ' + `numOpen`
-
+        #sys.exit(1)
         for i in range(numOpen):
             try:
                 #find if href has .pdf in it
-                filenameCounter=i+startValue
+                #filenameCounter=i+startValue
+                print linkElems[i]
+                sys.exit(1)
+                classResult = linkElems[i].get('class')
+                if ("result-title" in classResult):
+                    #res = requests.get(linkElems[i].get('href'))
+                    print "found a title and its hyperlink value is" + res;
+                else:
+                    continue;
                 try:
-                    res = requests.get('http://google.com' + linkElems[i].get('href'))
+                    res = requests.get(linkElems[i].get('href'))
                     res.raise_for_status()
-                except requests.HTTPError, e:
-                    print "exception occured"+ `e.response.status_code`
+                except:
+                    print "exception occured"
+                          #+ `e.response.status_code`
 
 
                 else:
@@ -134,11 +192,10 @@ def parseGResults(myQS,startValue):
                 continue
 
 
+            #see if you can raise more than 10 google results
+#for gCounter in my_range (startValue,numberOfGoogleResults,10):
+#start =gCounter
 
-#see if you can raise more than 10 google results
-for gCounter in my_range (startValue,numberOfGoogleResults,10):
-    start =gCounter
-    print start
-    queryString=queryStringStub+ '+&start='+`start`+'&num=10'
-    parseGResults(queryString,start)
+queryString=queryStringStub
+parseGResults(queryString)
  
