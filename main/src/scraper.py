@@ -1,18 +1,7 @@
-#changes included in this version
-#1.1 download and save html files from the first one results---done
-#1.2 download and save html files from the first ten results----done
-#1.3 download html files from the first ten results---done
-#2. convert first 10 html results to text and save them---done
-#3. download pdf files from the first ten results--done
-#4. convert the pdf files into txt and save them---done
-#5. create a folder structure
 
 import requests, bs4, sys, webbrowser, html2text, os , PyPDF2, urllib2, smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
-# encoding=utf8
-# the html file written by beautifulsoup4 wasnt getting parsed by html2text.
-#So converted it to default utf8 encoding
 
 
 #uncomment these 2 lines of code if you get the below error. Some unicode encoding stuff
@@ -22,18 +11,6 @@ sys.setdefaultencoding('utf8')
 
 #print os.getcwd()
 os.chdir('../../outputs/')
-#print os.getcwd()
-#exit()
-#various typical requests
-#todo: add into a string array and call ?
-#res = requests.get('https://www.google.com/search?q=pests+diseases+tamil+nadu+agriculture')
-
-#res = requests.get('https://www.google.com/search?q=soil+degradation+tamil+nadu+agriculture')
-#res = requests.get('https://www.google.com/search?q=farm+sizes+tamil+nadu+agriculture')
-#res = requests.get('https://www.google.com/search?q=%22farm+size%22+tamil+nadu+agriculture+&start=1&num=10')
-#https://www.google.com/search?q=%22farm+size%22+tamil+nadu+agriculture+&start=1&num=10
-#ideal query:res = requests.get('https://www.google.com/search?q=%22farm+size%22+tamil+nadu+agriculture+&start=1&num=10')
-#				https://www.google.com/search?q=%22pests+diseases%22+tamil+nadu+agriculture+&start=41&num=10
 
 stubFilename='rawOutputs'
 queryStringStubForTucson='http://tucson.craigslist.org/search/cto?'
@@ -46,7 +23,6 @@ gmailUsername="saf@gmail.com"
 gmailPwd="sfasd"
 fromaddr="adf@gmail.com"
 toaddrs="asdf@gmail.com"
-#toaddr="mithunpaul08@gmail.com"
 subjectForEmail= "Details of the used cars in tucson/phoenix area you asked for"
 carbonCopy = "asfa@gmail.com"
 bodyOfEmail="Hi,\n These are the parameters used for this query:\n\n"
@@ -101,13 +77,9 @@ def sendEmail(queryResults,carObject):
     ])
 
     server = smtplib.SMTP('smtp.gmail.com:587')
-    #server = smtplib.SMTP('smtp.gmail.com', 587)
     server.ehlo()
     server.starttls()
     server.login(gmailUsername, gmailPwd)
-    #print(fromaddr)
-    #print(toaddr)
-    #print(msg)
     server.sendmail(fromaddr, toaddr, msg)
     server.quit()
     print("done sending email")
@@ -118,12 +90,8 @@ def buildMessageBody(carObjectToBuildQuery):
 
 
 def writeToOutputFile(textToWrite):
-     # #write the converted text to a txt file
-    #target = open(outputDirectory+combinedFileName+'InTxtFormat.txt', 'w')
     target = open(stubFilename+'.txt', 'w')
-     #if you get this error: TypeError: expected a character buffer object
     target.write(html2text.html2text(textToWrite).encode('utf-8'))
-    #target.write(textToWrite)
     target.close()
 
 
@@ -156,7 +124,6 @@ def parseGResults(myQS):
                 classResult = link.get('class')
                 if (classResult != None):
                     if ("result-title" in classResult):
-                        #print(link.get('class'))
                         #if the class exists, get the link, if its not null
                         linkToNextPage = link.get('href')
                         if (linkToNextPage != None):
@@ -183,13 +150,8 @@ def parseGResults(myQS):
                                 if(content != None):
                                 # parse the content into a format that soup understands
                                     childSoup = bs4.BeautifulSoup(content, "lxml")
-                                    #print childSoup
-                                    #print "done child data"
-
                                     #to find the attributes of the car, which is inside <div class="mapAndAttrs">
-
                                     #find all div tags
-
                                     listOfSpanValues = []
 
                                     individualCarDetails = ""
