@@ -45,8 +45,8 @@ gmailPwd="Alohomora5"
 fromaddr="mithunpaul08@gmail.com"
 toaddrs="mithunpaul08@gmail.com"
 subjectForEmail= "Details of used cars in tucson you asked for"
-carbonCopy = 'nn7607@gmail.com'
-bodyOfEmail="Hi, the details used for this query are"
+carbonCopy = "nn7607@gmail.com"
+bodyOfEmail="Hi, the details used for this query are:\n"
 
 class myCar:
     min_price = ""
@@ -85,16 +85,14 @@ def createQueryObject(queryStringStubToBuild, carObject):
     return queryStringToSearch
 
 def sendEmail(queryResults,carObject):
-    print "entering sendEmail Function"
-    print queryResults;
     bodyWithQueryDetails=createQueryObject(bodyOfEmail,carObject);
-    print bodyWithQueryDetails
-    finalMessageToSend=bodyWithQueryDetails+"and the results are as follows:"+queryResults
-    print finalMessageToSend
+    bodyWithQueryDetailsreplacedAmbersand=bodyWithQueryDetails.replace("&", "\n")
+    finalMessageToSend=bodyWithQueryDetailsreplacedAmbersand+"\n \nAnd the results are as follows:\n\n"+queryResults
 
     msg = "\r\n".join([
         "From: "+fromaddr,
         "To: "+toaddrs,
+        "CC: " + carbonCopy,
         "Subject:"+subjectForEmail,
         "",
         finalMessageToSend
@@ -104,7 +102,7 @@ def sendEmail(queryResults,carObject):
     server.ehlo()
     server.starttls()
     server.login(gmailUsername, gmailPwd)
-    server.sendmail(fromaddr, toaddrs, finalMessageToSend)
+    server.sendmail(fromaddr, toaddrs, msg)
     server.quit()
     print("done sending email")
 
@@ -204,7 +202,7 @@ def parseGResults(myQS):
                                             listOfCars.append(str(urlToThisCar))
 
             finalListOfCars = "\n\n".join(listOfCars)
-            sendEmail(str(finalListOfCars),carObjectToBuildQuery)
+            sendEmail(finalListOfCars,carObjectToBuildQuery)
     except:
         print('generic exception: ')
 
