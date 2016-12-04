@@ -100,7 +100,7 @@ def parseGResults(myQS):
                         childurl=stubUrlForTucsonCLInnerpages+linkToNextPage
                         #once you get the link, open and go into that page.
                         try:
-                            url = urllib2.urlopen(childurl)
+                            secondChildurl = urllib2.urlopen(childurl)
                         except urllib2.HTTPError, e:
                             print('HTTPError = ' + str(e.code))
                         except urllib2.URLError, e:
@@ -111,7 +111,7 @@ def parseGResults(myQS):
                             import traceback
                             print('generic exception: ' + traceback.format_exc())
                         else:
-                            content = url.read()
+                            content = secondChildurl.read()
                             if(content != None):
                             # parse the content into a format that soup understands
                                 childSoup = bs4.BeautifulSoup(content, "lxml")
@@ -137,9 +137,11 @@ def parseGResults(myQS):
                                         #print carAttributes
                                         individualCarDetails=str(listOfSpanValues)
                                         print individualCarDetails
+                                        print childurl
+                                        urlToThisCar="urlToThisCar:"+childurl
                                         listOfCars.append(individualCarDetails)
+                                        listOfCars.append(str(urlToThisCar))
 
-        #finalListOfCars=str(listOfCars)
         finalListOfCars = "\n\n".join(listOfCars)
         sendEmail(finalListOfCars)
     except:
