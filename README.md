@@ -18,7 +18,7 @@ Code that gets the used car results of a given craigslist query, and converts it
 Eg: mithunpaul@chung:~/Desktop/fall2016NLPResearch/googleScraper/googleScraping/main/src$ python scraper.py
 
 #to change the parameters:
-Update the value of the variable numberOfGoogleResults in scraper.py in this function
+Go to scraper.py and update the variables.
 
 
 #"Search Query attributes used to build the query string"
@@ -33,6 +33,8 @@ def fillSearchQueryAttributes(queryCar):
     queryCar.auto_title_status='1'
 
 #changing email parameters
+Go to scraper.py and change the following
+
 gmailUsername=“2324@gmail.com"
 gmailPwd=""
 fromaddr=“234234@gmail.com"
