@@ -44,4 +44,6 @@ bodyOfEmail="Hi,\n These are the parameters used for this query:\n\n"
 
 
 #Todo:
-attach SSH or PKI instead of typing in the pwd in raw text
+1. attach SSH or PKI instead of typing in the pwd in raw text
+2. convert to excel sheet format
+3. send out alerts only if this posting hasnt been seen before.
