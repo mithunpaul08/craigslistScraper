@@ -1,3 +1,4 @@
+#this is the live version. It contains actual password. Dont push to git
 
 import requests, bs4, sys, webbrowser, html2text, os , PyPDF2, urllib2, smtplib
 from email.MIMEMultipart import MIMEMultipart
@@ -9,18 +10,15 @@ from email.MIMEText import MIMEText
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-#print os.getcwd()
-#os.chdir('../../outputs/')
-
 stubFilename='rawOutputs'
 queryStringStubForTucson='http://tucson.craigslist.org/search/cto?'
-actualQueryString='http://tucson.craigslist.org/search/cto?sort=priceasc&min_price=1&max_price=6000&auto_make_model=honda+%7C+toyota&min_auto_year=2001&max_auto_year=2016&min_auto_miles=300&max_auto_miles=110000&auto_title_status=1'
+actualQueryString='http://tucson.craigslist.org/search/cto?sort=priceasc&min_price=1&max_price=6000&auto_make_model=honda+%7C+toyota&min_auto_year=2001&max_auto_year=2016&min_auto_miles=300&max_auto_miles=110000&auto_title_status=1&auto_transmission=2'
 numberOfGoogleResults=1000
 startValue=1
 stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
 stubUrlForPhxCLInnerpages='http://phoenix.craigslist.org/'
 gmailUsername="mithunpaul08@gmail.com"
-gmailPwd="dfsdf"
+gmailPwd="23423"
 fromaddr="mithunpaul08@gmail.com"
 toaddr="nithinitzme@gmail.com"
 #toaddr="mithunpaul08@gmail.com"
@@ -37,6 +35,7 @@ class myCar:
     min_auto_miles=''
     max_auto_miles=''
     auto_title_status=''
+    auto_transmission=''
 
 
 
@@ -50,6 +49,7 @@ def fillSearchQueryAttributes(queryCar):
     queryCar.min_auto_miles='300'
     queryCar.max_auto_miles='110000'
     queryCar.auto_title_status='1'
+    queryCar.auto_transmission='2'
 
 def createQueryObject(queryStringStubToBuild, carObject):
     queryStringToSearch = str(queryStringStubToBuild)+"sort=priceasc&min_price="+carObject.min_price+\
@@ -59,6 +59,7 @@ def createQueryObject(queryStringStubToBuild, carObject):
                                              "&max_auto_year="+carObject.max_auto_year+\
                                              "&min_auto_miles="+carObject.min_auto_miles+\
                                              "&max_auto_miles="+carObject.max_auto_miles+\
+                                            "&auto_transmission="+carObject.auto_transmission+\
                                              "&auto_title_status="+carObject.auto_title_status
     return queryStringToSearch
 
@@ -88,7 +89,7 @@ def sendEmail(queryResults,carObject):
     server.sendmail(fromaddr, toaddr, msg)
     print("getting here at 68468")
     server.quit()
-    print("done sending email")
+    print("done sending email to:"+toaddr)
 
 def buildMessageBody(carObjectToBuildQuery):
     bodyOfEmail = "Hi, the details used for this query are as follows:"+carObjectToBuildQuery
