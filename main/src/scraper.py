@@ -10,7 +10,7 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 #print os.getcwd()
-os.chdir('../../outputs/')
+#os.chdir('../../outputs/')
 
 stubFilename='rawOutputs'
 queryStringStubForTucson='http://tucson.craigslist.org/search/cto?'
@@ -19,12 +19,13 @@ numberOfGoogleResults=1000
 startValue=1
 stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
 stubUrlForPhxCLInnerpages='http://phoenix.craigslist.org/'
-gmailUsername="saf@gmail.com"
-gmailPwd="sfasd"
-fromaddr="adf@gmail.com"
-toaddrs="asdf@gmail.com"
+gmailUsername="mithunpaul08@gmail.com"
+gmailPwd="dfsdf"
+fromaddr="mithunpaul08@gmail.com"
+toaddr="nithinitzme@gmail.com"
+#toaddr="mithunpaul08@gmail.com"
 subjectForEmail= "Details of the used cars in tucson/phoenix area you asked for"
-carbonCopy = "asfa@gmail.com"
+carbonCopy = "mithunpaul08@gmail.com"
 bodyOfEmail="Hi,\n These are the parameters used for this query:\n\n"
 
 class myCar:
@@ -76,11 +77,16 @@ def sendEmail(queryResults,carObject):
         finalMessageToSend
     ])
 
+    print("getting here at 3687")
     server = smtplib.SMTP('smtp.gmail.com:587')
     server.ehlo()
+    print("getting here at 8637")
     server.starttls()
+    print("getting here at 52895")
     server.login(gmailUsername, gmailPwd)
+    print("getting here at 5498")
     server.sendmail(fromaddr, toaddr, msg)
+    print("getting here at 68468")
     server.quit()
     print("done sending email")
 
@@ -190,7 +196,9 @@ def parseGResults(myQS):
             finalListOfCars = "\n\n".join(listOfCars)
             sendEmail(finalListOfCars,carObjectToBuildQuery)
     except:
-        print('generic exception: ')
+        #print('generic exception: ')
+        import traceback
+        print('generic exception: ' + traceback.format_exc())
         #+sys.exc_info()[0])
 
 

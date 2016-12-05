@@ -3,3 +3,5 @@ outputs
 py3scraper.py
 dist
 build
+
+scraper_local.py
