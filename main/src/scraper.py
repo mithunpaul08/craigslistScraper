@@ -1,4 +1,12 @@
-#this is not the live version. It contains dummy password. This is for testing only. this is not connected to cron job
+
+# #this is not the live version. It contains dummy password. This is for testing only. this is not connected to cron job
+
+#todo
+#1. get the unique url for each car,
+#push it to a hash table
+# check this hash table every time you add a new car object to the list
+# if the car already exists, dont add
+#send mail only if the list is not empty
 
 import requests, bs4, sys, webbrowser, html2text, os , PyPDF2, urllib2, smtplib
 from email.MIMEMultipart import MIMEMultipart
