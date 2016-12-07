@@ -1,4 +1,4 @@
-#this is the live version. It contains actual password. Dont push to git
+#this is not the live version. It contains dummy password. This is for testing only. this is not connected to cron job
 
 import requests, bs4, sys, webbrowser, html2text, os , PyPDF2, urllib2, smtplib
 from email.MIMEMultipart import MIMEMultipart
@@ -18,10 +18,10 @@ startValue=1
 stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
 stubUrlForPhxCLInnerpages='http://phoenix.craigslist.org/'
 gmailUsername="mithunpaul08@gmail.com"
-gmailPwd="23423"
+gmailPwd="asfds"
 fromaddr="mithunpaul08@gmail.com"
-toaddr="nithinitzme@gmail.com"
 #toaddr="mithunpaul08@gmail.com"
+toaddr="nithinitzme@gmail.com"
 subjectForEmail= "Details of the used cars in tucson/phoenix area you asked for"
 carbonCopy = "mithunpaul08@gmail.com"
 bodyOfEmail="Hi,\n These are the parameters used for this query:\n\n"
@@ -46,7 +46,7 @@ def fillSearchQueryAttributes(queryCar):
     queryCar.auto_make_model="honda+%7C+toyota"
     queryCar.min_auto_year="2005"
     queryCar.max_auto_year="2016"
-    queryCar.min_auto_miles='300'
+    queryCar.min_auto_miles='1'
     queryCar.max_auto_miles='110000'
     queryCar.auto_title_status='1'
     queryCar.auto_transmission='2'
@@ -136,10 +136,11 @@ def parseGResults(myQS):
                         if (linkToNextPage != None):
                             print("\n")
                             childurl = stubUrlForTucsonCLInnerpages + linkToNextPage
-                            #print(linkToNextPage)
+                            #sometimes they find local nearby results also, but their url is different
                             if("phoenix" in linkToNextPage):
                                 childurl = "http:" + linkToNextPage
-
+                            print(linkToNextPage)
+                            #sys.exit(1)
                             #once you get the link, open and go into that page.
                             try:
                                 secondChildurl = urllib2.urlopen(childurl)
