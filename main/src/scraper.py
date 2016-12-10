@@ -26,14 +26,14 @@ startValue=1
 stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
 stubUrlForPhxCLInnerpages='http://phoenix.craigslist.org/'
 gmailUsername="mithunpaul08@gmail.com"
-gmailPwd="asfds"
+gmailPwd="234234"
 fromaddr="mithunpaul08@gmail.com"
-toaddr="mithunpaul08@gmail.com"
-#toaddr="nithinitzme@gmail.com"
-subjectForEmail= "Details of the used cars in tucson/phoenix area you asked for"
+#toaddr="mithunpaul08@gmail.com"
+toaddr="nithinitzme@gmail.com"
+subjectForEmail= "Today's details of the used cars in tucson/phoenix area you asked for"
 carbonCopy = "mithunpaul08@gmail.com"
-bodyOfEmail="Hi,\n These are the parameters used for this query:\n\n"
-carIdHashTable = {}
+bodyOfEmail="Hi,\n So the results you see below are what were newly found today. Everything else is same as what was sent yesterday. \nThese are the parameters used for this query:\n\n"
+
 
 class myCar:
     min_price = ""
@@ -72,10 +72,15 @@ def createQueryObject(queryStringStubToBuild, carObject):
                                              "&auto_title_status="+carObject.auto_title_status
     return queryStringToSearch
 
-def sendEmail(queryResults,carObject):
-    bodyWithQueryDetails=createQueryObject(bodyOfEmail,carObject);
-    bodyWithQueryDetailsreplacedAmbersand=bodyWithQueryDetails.replace("&", "\n")
-    finalMessageToSend=bodyWithQueryDetailsreplacedAmbersand+"\n \nAnd the results are as follows:\n\n"+queryResults
+def sendEmail(listOfMyCars,carObject):
+    finalMessageToSend=""
+    if(listOfMyCars.__len__()==0):
+        finalMessageToSend="hi, no new cars were found in today's search. Have a good day"
+    else:
+        queryResultsAsString="\n\n".join(listOfMyCars)
+        bodyWithQueryDetails=createQueryObject(bodyOfEmail,carObject);
+        bodyWithQueryDetailsreplacedAmbersand=bodyWithQueryDetails.replace("&", "\n")
+        finalMessageToSend=bodyWithQueryDetailsreplacedAmbersand+"\n \nAnd the results are as follows:\n\n"+queryResultsAsString
     print("getting here at 32423")
 
     msg = "\r\n".join([
@@ -87,18 +92,21 @@ def sendEmail(queryResults,carObject):
         finalMessageToSend
     ])
 
-    print("getting here at 3687")
+    #print("getting here at 3687")
     server = smtplib.SMTP('smtp.gmail.com:587')
     server.ehlo()
-    print("getting here at 8637")
+    #print("getting here at 8637")
     server.starttls()
-    print("getting here at 52895")
+    #print("getting here at 52895")
     server.login(gmailUsername, gmailPwd)
-    print("getting here at 5498")
+    #print("getting here at 5498")
     server.sendmail(fromaddr, toaddr, msg)
-    print("getting here at 68468")
+    #print("getting here at 68468")
     server.quit()
     print("done sending email to:"+toaddr)
+
+
+
 
 def buildMessageBody(carObjectToBuildQuery):
     bodyOfEmail = "Hi, the details used for this query are as follows:"+carObjectToBuildQuery
@@ -116,23 +124,29 @@ def writeToOutputFile(textToWrite):
     target.write(textToWrite);
     target.close()
 
-def checkAndadduidToHashtable(uniqueId):
-    if uniqueId in carIdHashTable:
+def checkAndadduidToHashtable(uniqueId,localhtToCheck):
+    if uniqueId in localhtToCheck:
         print("uniquePageId is:"+uniqueId)
         return True
     else:
-        carIdHashTable[uniqueId] = 1
+        localhtToCheck[uniqueId] = 1
         return False
 
 def readFromJsonToHashtable(filename):
     # load from file:
     with open(filename, 'r') as f:
         try:
-            carIdHashTable = json.load(f)
+            #print("inside child :length of hashtable that just came in is:"+`carIdHashTable.__len__()`)
+            #carIdHashTable["test"] = 1
+           # print("inside child :length of hashtable that just came in is:"+`carIdHashTable.__len__()`)
+            htMyTable = json.load(f)
+            #print("inside child :length of hashtable inside is:"+`htMyTable.__len__()`)
+            #carIdHashTable=htMyTable
+           # print("inside child :length of carIdHashTable inside is:"+`carIdHashTable.__len__()`)
         # if the file is empty the ValueError will be thrown
         except ValueError:
             carIdHashTable = {}
-    return carIdHashTable
+    return htMyTable
 
 
 def writeToFileAsJson(myhashTable, filename):
@@ -143,6 +157,7 @@ def writeToFileAsJson(myhashTable, filename):
 
 def parseGResults(myQS):
     try:
+        carIdHashTable = {}
         carObjectToBuildQuery = myCar()
         fillSearchQueryAttributes(carObjectToBuildQuery)
         queryStringToSearch=createQueryObject(queryStringStubForTucson,carObjectToBuildQuery)
@@ -185,12 +200,8 @@ def parseGResults(myQS):
                             # In second pass onwards, read this file, store into a hash table.
 
                             #3. read from file to hashtable
-                            carIdHashTable= readFromJsonToHashtable(stubFilename)
-                            print("length of hashtable is:"+`carIdHashTable.__len__()`)
-
-
-
-
+                            carIdHashTable=readFromJsonToHashtable(stubFilename)
+                            print("length of hashtable in parent is:"+`carIdHashTable.__len__()`)
 
                             uniquePageIdRoot = re.search('([0-9]+).html', linkToNextPage)
                             uniquePageId=uniquePageIdRoot.group(1)
@@ -206,7 +217,7 @@ def parseGResults(myQS):
 
 
                             #sys.exit(1)
-                            if(checkAndadduidToHashtable(uniquePageId)):
+                            if(checkAndadduidToHashtable(uniquePageId,carIdHashTable)):
                                 print("car details were already sent yday. Not adding to the mailing list.")
                             else:
 
@@ -264,11 +275,13 @@ def parseGResults(myQS):
                                                 listOfCars.append(individualCarDetails)
                                                 listOfCars.append(str(urlToThisCar))
 
-            finalListOfCars = "\n\n".join(listOfCars)
+            #finalListOfCars = "\n\n".join(listOfCars)
             #write hashtable to file in the very first pass.
            # writeToFileAsJson(carIdHashTable,stubFilename)
 
-           # sendEmail(finalListOfCars,carObjectToBuildQuery)
+
+            #sendEmail(finalListOfCars,carObjectToBuildQuery)
+            sendEmail(listOfCars,carObjectToBuildQuery)
     except:
         #print('generic exception: ')
         import traceback
