@@ -35,6 +35,7 @@ carbonCopy = "mithunpaul08@gmail.com"
 bodyOfEmail="Hi,\n So the results you see below are what were newly found today. Everything else is same as what was sent yesterday. \nThese are the parameters used for this query:\n\n"
 path = "/home/mithunpaul/Desktop/fall2016NLPResearch/craigslistScraper/main/src"
 
+
 class myCar:
     min_price = ""
     max_price =""
@@ -294,8 +295,7 @@ cwd = os.getcwd()
 print("current directory is:"+cwd)
 # Now change the directory
 os.chdir( path )
-cwd = os.getcwd()
-print("current directory is:"+cwd)
-sys.exit(1)
+
+
 parseGResults(actualQueryString)
 
