@@ -8,7 +8,7 @@
 # if the car already exists, dont add
 #send mail only if the list is not empty
 
-import requests, bs4, sys, webbrowser, html2text, os , PyPDF2, urllib2, smtplib
+import requests, bs4, sys, webbrowser, html2text, os , PyPDF2, urllib2, smtplib, re, json
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 
@@ -18,7 +18,7 @@ from email.MIMEText import MIMEText
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-stubFilename='rawOutputs'
+stubFilename='carIdHashTable.json'
 queryStringStubForTucson='http://tucson.craigslist.org/search/cto?'
 actualQueryString='http://tucson.craigslist.org/search/cto?sort=priceasc&min_price=1&max_price=6000&auto_make_model=honda+%7C+toyota&min_auto_year=2001&max_auto_year=2016&min_auto_miles=300&max_auto_miles=110000&auto_title_status=1&auto_transmission=2'
 numberOfGoogleResults=1000
@@ -28,11 +28,12 @@ stubUrlForPhxCLInnerpages='http://phoenix.craigslist.org/'
 gmailUsername="mithunpaul08@gmail.com"
 gmailPwd="asfds"
 fromaddr="mithunpaul08@gmail.com"
-#toaddr="mithunpaul08@gmail.com"
-toaddr="nithinitzme@gmail.com"
+toaddr="mithunpaul08@gmail.com"
+#toaddr="nithinitzme@gmail.com"
 subjectForEmail= "Details of the used cars in tucson/phoenix area you asked for"
 carbonCopy = "mithunpaul08@gmail.com"
 bodyOfEmail="Hi,\n These are the parameters used for this query:\n\n"
+carIdHashTable = {}
 
 class myCar:
     min_price = ""
@@ -104,15 +105,44 @@ def buildMessageBody(carObjectToBuildQuery):
 
 
 
-def writeToOutputFile(textToWrite):
+def encodeAndwriteToOutputFile(textToWrite):
     target = open(stubFilename+'.txt', 'w')
     target.write(html2text.html2text(textToWrite).encode('utf-8'))
     target.close()
 
 
+def writeToOutputFile(textToWrite):
+    target = open(stubFilename+'.txt', 'w')
+    target.write(textToWrite);
+    target.close()
+
+def checkAndadduidToHashtable(uniqueId):
+    if uniqueId in carIdHashTable:
+        print("uniquePageId is:"+uniqueId)
+        return True
+    else:
+        carIdHashTable[uniqueId] = 1
+        return False
+
+def readFromJsonToHashtable(filename):
+    # load from file:
+    with open(filename, 'r') as f:
+        try:
+            carIdHashTable = json.load(f)
+        # if the file is empty the ValueError will be thrown
+        except ValueError:
+            carIdHashTable = {}
+    return carIdHashTable
+
+
+def writeToFileAsJson(myhashTable, filename):
+    # save to file:
+    with open(filename, 'w') as f:
+        json.dump(myhashTable, f)
+    f.close()
+
 def parseGResults(myQS):
     try:
-
         carObjectToBuildQuery = myCar()
         fillSearchQueryAttributes(carObjectToBuildQuery)
         queryStringToSearch=createQueryObject(queryStringStubForTucson,carObjectToBuildQuery)
@@ -148,63 +178,97 @@ def parseGResults(myQS):
                             if("phoenix" in linkToNextPage):
                                 childurl = "http:" + linkToNextPage
                             print(linkToNextPage)
+
+                            #to check if we have seen this ad before.
+                            # Store all the unique ids in a file in the first pass.
+
+                            # In second pass onwards, read this file, store into a hash table.
+
+                            #3. read from file to hashtable
+                            carIdHashTable= readFromJsonToHashtable(stubFilename)
+                            print("length of hashtable is:"+`carIdHashTable.__len__()`)
+
+
+
+
+
+                            uniquePageIdRoot = re.search('([0-9]+).html', linkToNextPage)
+                            uniquePageId=uniquePageIdRoot.group(1)
+                            print("uniquePageId is:"+uniquePageId)
+
+                            # Check for the unique id in a hashtable. Attach to email
+                            #only if it is new.
+
+
+
+                            # 1. store to hash table- in first pass
+                            #adduidToHashtable(uniquePageId)
+
+
                             #sys.exit(1)
-                            #once you get the link, open and go into that page.
-                            try:
-                                secondChildurl = urllib2.urlopen(childurl)
-                            except urllib2.HTTPError, e:
-                                print('HTTPError = ' + str(e.code))
-                            except urllib2.URLError, e:
-                                print('URLError = ' + str(e.reason))
-                            except httplib.HTTPException, e:
-                                print('HTTPException')
-                            except Exception:
-                                import traceback
-                                print('generic exception: ' + traceback.format_exc())
+                            if(checkAndadduidToHashtable(uniquePageId)):
+                                print("car details were already sent yday. Not adding to the mailing list.")
                             else:
-                                content = secondChildurl.read()
-                                if(content != None):
-                                # parse the content into a format that soup understands
-                                    childSoup = bs4.BeautifulSoup(content, "lxml")
-                                    #to find the attributes of the car, which is inside <div class="mapAndAttrs">
-                                    #find all div tags
-                                    listOfSpanValues = []
 
-                                    individualCarDetails = ""
+                                #once you get the link, open and go into that page.
+                                try:
+                                    secondChildurl = urllib2.urlopen(childurl)
+                                except urllib2.HTTPError, e:
+                                    print('HTTPError = ' + str(e.code))
+                                except urllib2.URLError, e:
+                                    print('URLError = ' + str(e.reason))
+                                except httplib.HTTPException, e:
+                                    print('HTTPException')
+                                except Exception:
+                                    import traceback
+                                    print('generic exception: ' + traceback.format_exc())
+                                else:
+                                    content = secondChildurl.read()
+                                    if(content != None):
+                                    # parse the content into a format that soup understands
+                                        childSoup = bs4.BeautifulSoup(content, "lxml")
+                                        #to find the attributes of the car, which is inside <div class="mapAndAttrs">
+                                        #find all div tags
+                                        listOfSpanValues = []
 
-                                    carTitleSpan = childSoup.find("span", {"id": "titletextonly"})
-                                    if(carTitleSpan!=None):
-                                        carTitle = "Name:"+carTitleSpan.text+"\n"
-                                        individualCarDetails+=carTitle
+                                        individualCarDetails = ""
+
+                                        carTitleSpan = childSoup.find("span", {"id": "titletextonly"})
+                                        if(carTitleSpan!=None):
+                                            carTitle = "Name:"+carTitleSpan.text+"\n"
+                                            individualCarDetails+=carTitle
 
 
-                                    carPriceSpan = childSoup.find("span", {"class": "price"})
-                                    if (carPriceSpan != None):
-                                        carPrice= "Price:"+carPriceSpan.text+"\n"
-                                        individualCarDetails+=carPrice
+                                        carPriceSpan = childSoup.find("span", {"class": "price"})
+                                        if (carPriceSpan != None):
+                                            carPrice= "Price:"+carPriceSpan.text+"\n"
+                                            individualCarDetails+=carPrice
 
 
-                                    myDivTags=childSoup.find_all("div", {"class": "mapAndAttrs"})
-                                    for individualDivs in myDivTags:
-                                        if(len(individualDivs.find_all('span'))!=0):
-                                            for spanElements in individualDivs.find_all('span'):
-                                                mySpanElementText=str(spanElements.text)
-                                                #print spanElements.text
-                                                #carAttributes= carAttributes+mySpanElementText
-                                                listOfSpanValues.append(mySpanElementText)
-                                            #carAttributes=String.join(listOfSpanValues, '')
-                                            #print carAttributes
-                                            individualCarDetails=individualCarDetails+str(listOfSpanValues)
-                                            print individualCarDetails
-                                            print childurl
-                                            #print individualCarDetails
-                                            #sys.exit(1)
-                                            urlToThisCar="Link To This Car:"+childurl
-                                            listOfCars.append(individualCarDetails)
-                                            listOfCars.append(str(urlToThisCar))
+                                        myDivTags=childSoup.find_all("div", {"class": "mapAndAttrs"})
+                                        for individualDivs in myDivTags:
+                                            if(len(individualDivs.find_all('span'))!=0):
+                                                for spanElements in individualDivs.find_all('span'):
+                                                    mySpanElementText=str(spanElements.text)
+                                                    #print spanElements.text
+                                                    #carAttributes= carAttributes+mySpanElementText
+                                                    listOfSpanValues.append(mySpanElementText)
+                                                #carAttributes=String.join(listOfSpanValues, '')
+                                                #print carAttributes
+                                                individualCarDetails=individualCarDetails+str(listOfSpanValues)
+                                                print individualCarDetails
+                                                print childurl
+                                                #print individualCarDetails
+                                                #sys.exit(1)
+                                                urlToThisCar="Link To This Car:"+childurl
+                                                listOfCars.append(individualCarDetails)
+                                                listOfCars.append(str(urlToThisCar))
 
             finalListOfCars = "\n\n".join(listOfCars)
-            sendEmail(finalListOfCars,carObjectToBuildQuery)
+            #write hashtable to file in the very first pass.
+           # writeToFileAsJson(carIdHashTable,stubFilename)
+
+           # sendEmail(finalListOfCars,carObjectToBuildQuery)
     except:
         #print('generic exception: ')
         import traceback
