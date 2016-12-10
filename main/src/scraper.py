@@ -1,5 +1,5 @@
+# #this is no the live version. It contains dummy password. This is for testing only. this is  connected to cron job
 
-# #this is not the live version. It contains dummy password. This is for testing only. this is not connected to cron job
 
 #todo
 #1. get the unique url for each car,
@@ -26,14 +26,14 @@ startValue=1
 stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
 stubUrlForPhxCLInnerpages='http://phoenix.craigslist.org/'
 gmailUsername="mithunpaul08@gmail.com"
-gmailPwd="234234"
+gmailPwd="23423"
 fromaddr="mithunpaul08@gmail.com"
 #toaddr="mithunpaul08@gmail.com"
 toaddr="nithinitzme@gmail.com"
 subjectForEmail= "Today's details of the used cars in tucson/phoenix area you asked for"
 carbonCopy = "mithunpaul08@gmail.com"
 bodyOfEmail="Hi,\n So the results you see below are what were newly found today. Everything else is same as what was sent yesterday. \nThese are the parameters used for this query:\n\n"
-
+path = "/home/mithunpaul/Desktop/fall2016NLPResearch/craigslistScraper/main/src"
 
 class myCar:
     min_price = ""
@@ -290,6 +290,12 @@ def parseGResults(myQS):
 
 
 
-
+cwd = os.getcwd()
+print("current directory is:"+cwd)
+# Now change the directory
+os.chdir( path )
+cwd = os.getcwd()
+print("current directory is:"+cwd)
+sys.exit(1)
 parseGResults(actualQueryString)
- 
+
