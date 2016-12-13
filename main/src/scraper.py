@@ -1,12 +1,7 @@
 # #this is no the live version. It contains dummy password. This is for testing only. this is  connected to cron job
 
-
 #todo
-#1. get the unique url for each car,
-#push it to a hash table
-# check this hash table every time you add a new car object to the list
-# if the car already exists, dont add
-#send mail only if the list is not empty
+#add ssh
 
 import requests, bs4, sys, webbrowser, html2text, os , PyPDF2, urllib2, smtplib, re, json
 from email.MIMEMultipart import MIMEMultipart
@@ -26,7 +21,7 @@ startValue=1
 stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
 stubUrlForPhxCLInnerpages='http://phoenix.craigslist.org/'
 gmailUsername="mithunpaul08@gmail.com"
-gmailPwd="234236"
+gmailPwd="Alohomora6"
 fromaddr="mithunpaul08@gmail.com"
 toaddr="mithunpaul08@gmail.com"
 #toaddr="nithinitzme@gmail.com"
@@ -125,13 +120,10 @@ def writeToOutputFile(textToWrite):
     target.write(textToWrite);
     target.close()
 
-def checkAndadduidToHashtable(uniqueId,localhtToCheck):
-    if uniqueId in localhtToCheck:
-        print("uniquePageId is:"+uniqueId)
-        return True
-    else:
-        localhtToCheck[uniqueId] = 1
-        return False
+def AdduidToHashtable(uniqueId, localhtToCheck):
+    localhtToCheck[uniqueId] = 1
+    print("length of hashtable inside checkAndadduidToHashtable is:"+`localhtToCheck.__len__()`)
+    return localhtToCheck
 
 def readFromJsonToHashtable(filename):
     # load from file:
@@ -158,7 +150,10 @@ def writeToFileAsJson(myhashTable, filename):
 
 def parseGResults(myQS):
     try:
+        #3. read from file to hashtable
         carIdHashTable = {}
+        carIdHashTable=readFromJsonToHashtable(stubFilename)
+        print("length of hashtable in parent is:"+`carIdHashTable.__len__()`)
         carObjectToBuildQuery = myCar()
         fillSearchQueryAttributes(carObjectToBuildQuery)
         queryStringToSearch=createQueryObject(queryStringStubForTucson,carObjectToBuildQuery)
@@ -200,9 +195,7 @@ def parseGResults(myQS):
 
                             # In second pass onwards, read this file, store into a hash table.
 
-                            #3. read from file to hashtable
-                            carIdHashTable=readFromJsonToHashtable(stubFilename)
-                            print("length of hashtable in parent is:"+`carIdHashTable.__len__()`)
+
 
                             uniquePageIdRoot = re.search('([0-9]+).html', linkToNextPage)
                             uniquePageId=uniquePageIdRoot.group(1)
@@ -218,9 +211,17 @@ def parseGResults(myQS):
 
 
                             #sys.exit(1)
-                            if(checkAndadduidToHashtable(uniquePageId,carIdHashTable)):
+                            print("length of hashtable before checkAndadduidToHashtable is:"+`carIdHashTable.__len__()`)
+                            if uniquePageId in carIdHashTable:
+                                #if the uid already exists in the hashtable, dont do anything.
+                                print("uniquePageId is:"+uniquePageId)
                                 print("car details were already sent yday. Not adding to the mailing list.")
+
+
                             else:
+                                #Else add it to the hashtable and send it as an email
+                                carIdHashTable=AdduidToHashtable(uniquePageId, carIdHashTable)
+                                print("length of hashtable before checkAndadduidToHashtable is:"+`carIdHashTable.__len__()`)
 
                                 #once you get the link, open and go into that page.
                                 try:
@@ -277,8 +278,9 @@ def parseGResults(myQS):
                                                 listOfCars.append(str(urlToThisCar))
 
             #finalListOfCars = "\n\n".join(listOfCars)
-            #write hashtable to file in the very first pass.
-           # writeToFileAsJson(carIdHashTable,stubFilename)
+            #write updated hashtable to file at the end of every pass.
+            print("length of hashtable before adding to file is:"+`carIdHashTable.__len__()`)
+            writeToFileAsJson(carIdHashTable,stubFilename)
 
 
             #sendEmail(finalListOfCars,carObjectToBuildQuery)
