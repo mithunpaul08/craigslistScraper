@@ -26,14 +26,14 @@ startValue=1
 stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
 stubUrlForPhxCLInnerpages='http://phoenix.craigslist.org/'
 gmailUsername="mithunpaul08@gmail.com"
-gmailPwd="234236"
+gmailPwd="23423"
 fromaddr="mithunpaul08@gmail.com"
-toaddr="mithunpaul08@gmail.com"
-#toaddr="nithinitzme@gmail.com"
+#toaddr="mithunpaul08@gmail.com"
+toaddr="nithinitzme@gmail.com"
 subjectForEmail= "Today's details of the used cars in tucson/phoenix area you asked for"
 carbonCopy = "mithunpaul08@gmail.com"
 bodyOfEmail="Hi,\n So the results you see below are what were newly found today. Everything else is same as what was sent yesterday. \nThese are the parameters used for this query:\n\n"
-path = "/home/mithunpaul/allResearch/clscraper/main/src/"
+path = "/home/mithunpaul/Desktop/fall2016NLPResearch/craigslistScraper/main/src"
 
 
 class myCar:
