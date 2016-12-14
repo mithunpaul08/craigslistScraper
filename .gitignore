@@ -6,3 +6,4 @@ build
 
 scraper_local.py
 *~
+*.sh
