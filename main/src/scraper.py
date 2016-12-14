@@ -32,8 +32,8 @@ else:
 
 
 fromaddr="mithunpaul08@gmail.com"
-toaddr="mithunpaul08@gmail.com"
-#toaddr="nithinitzme@gmail.com"
+#toaddr="mithunpaul08@gmail.com"
+toaddr="nithinitzme@gmail.com"
 subjectForEmail= "Today's details of the used cars in tucson/phoenix area you asked for"
 carbonCopy = "mithunpaul08@gmail.com"
 bodyOfEmail="Hi,\n So the results you see below are what were newly found today. Everything else is same as what was sent yesterday. \nThese are the parameters used for this query:\n\n"
