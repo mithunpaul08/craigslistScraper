@@ -21,7 +21,16 @@ startValue=1
 stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
 stubUrlForPhxCLInnerpages='http://phoenix.craigslist.org/'
 gmailUsername="mithunpaul08@gmail.com"
-gmailPwd="Alohomora6"
+        #print 'Number of arguments:', len(sys.argv)
+        #print 'Argument List:', str(sys.argv)
+
+if(len(sys.argv)>1):
+    gmailPwd=sys.argv[1]
+else:
+    print("no password specified in Command Line. Exiting.")
+    sys.exit(1)
+
+
 fromaddr="mithunpaul08@gmail.com"
 toaddr="mithunpaul08@gmail.com"
 #toaddr="nithinitzme@gmail.com"
@@ -82,7 +91,7 @@ def sendEmail(listOfMyCars,carObject):
     msg = "\r\n".join([
         "From: "+fromaddr,
         "To: " + toaddr,
-        "Cc: " + carbonCopy,
+        "CC: " + carbonCopy,
         "Subject:"+subjectForEmail,
         "",
         finalMessageToSend
@@ -153,7 +162,7 @@ def parseGResults(myQS):
         #3. read from file to hashtable
         carIdHashTable = {}
         carIdHashTable=readFromJsonToHashtable(stubFilename)
-        print("length of hashtable in parent is:"+`carIdHashTable.__len__()`)
+
         carObjectToBuildQuery = myCar()
         fillSearchQueryAttributes(carObjectToBuildQuery)
         queryStringToSearch=createQueryObject(queryStringStubForTucson,carObjectToBuildQuery)
