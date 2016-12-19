@@ -31,7 +31,7 @@ subjectForEmail= "Today's details of the used cars in tucson/phoenix area you as
 carbonCopy = "mithunpaul08@gmail.com"
 #if on laptop dont switch path. This is required because cron runs as a separate process in a separate directory in chung
 #turn this to true, if pushing to run on chung.cs.arizona.edu
-isRunningOnServer=False;
+isRunningOnServer=True;
 firstTimeRun=True;
 
 
