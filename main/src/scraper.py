@@ -32,7 +32,7 @@ carbonCopy = "mithunpaul08@gmail.com"
 #if on laptop dont switch path. This is required because cron runs as a separate process in a separate directory in chung
 #turn this to true, if pushing to run on chung.cs.arizona.edu
 isRunningOnServer=True;
-firstTimeRun=False;
+firstTimeRun=True;
 
 
 if(firstTimeRun):
@@ -156,7 +156,7 @@ def AdduidToHashtable(uniqueId, localhtToCheck):
 def readFromJsonToHashtable(filename):
     # load from file:
     htMyTable={}
-    with open(filename, 'w+') as f:
+    with open(filename, 'r') as f:
         try:
             #print("inside child :length of hashtable that just came in is:"+`carIdHashTable.__len__()`)
             #carIdHashTable["test"] = 1
@@ -185,7 +185,7 @@ def parseGResults(myQS):
         # if the file doesnt exist, create a new hashtable and add that to file
         #  or if the bool flag firstTimeRun= true
         carIdHashTable[445645423] = 1
-        if ((not (os.path.exists(stubFilename)))or firstTimeRun):
+        if (firstTimeRun):
             writeToFileAsJson(carIdHashTable, stubFilename)
 
         carIdHashTable=readFromJsonToHashtable(stubFilename)
