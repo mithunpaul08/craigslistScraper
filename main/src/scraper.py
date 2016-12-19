@@ -21,8 +21,8 @@ startValue=1
 stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
 stubUrlForPhxCLInnerpages='http://phoenix.craigslist.org/'
 gmailUsername="mithunpaul08@gmail.com"
-
-
+#the values can be manual, automatic, or both
+transmission="both"
 gmailPwd=""
 fromaddr="mithunpaul08@gmail.com"
 toaddr="mithunpaul08@gmail.com"
@@ -36,7 +36,7 @@ firstTimeRun=True;
 
 
 if(firstTimeRun):
-    bodyOfEmail="Hi, \nThese are the parameters used for this query:\n\n"
+    bodyOfEmail="Hi, \n Here is a list of all the cars found today in Craigslist. This is the very first email of craigslist scraping for used cars. Tomorrow onwards you will be shown only new hits that were not sent today. These are the parameters used for this query:\n\n"
 else:
     bodyOfEmail="Hi,\n So the results you see below are what were newly found today. Everything else is same as what was sent yesterday. \nThese are the parameters used for this query:\n\n"
 
@@ -79,7 +79,7 @@ def fillSearchQueryAttributes(queryCar):
     queryCar.min_auto_miles='1'
     queryCar.max_auto_miles='110000'
     queryCar.auto_title_status='1'
-    queryCar.auto_transmission='2'
+    queryCar.auto_transmission='1'
 
 def createQueryObject(queryStringStubToBuild, carObject):
     queryStringToSearch = str(queryStringStubToBuild)+"sort=priceasc&min_price="+carObject.min_price+\
@@ -91,6 +91,9 @@ def createQueryObject(queryStringStubToBuild, carObject):
                                              "&max_auto_miles="+carObject.max_auto_miles+\
                                             "&auto_transmission="+carObject.auto_transmission+\
                                              "&auto_title_status="+carObject.auto_title_status
+    if (transmission=="both"):
+        queryStringToSearch=queryStringToSearch+"&auto_transmission="+`2`
+
     return queryStringToSearch
 
 def sendEmail(listOfMyCars,carObject):
