@@ -21,8 +21,7 @@ startValue=1
 stubUrlForTucsonCLInnerpages='http://tucson.craigslist.org/'
 stubUrlForPhxCLInnerpages='http://phoenix.craigslist.org/'
 gmailUsername="mithunpaul08@gmail.com"
-        #print 'Number of arguments:', len(sys.argv)
-        #print 'Argument List:', str(sys.argv)
+
 
 gmailPwd=""
 fromaddr="mithunpaul08@gmail.com"
@@ -30,11 +29,24 @@ toaddr="mithunpaul08@gmail.com"
 #toaddr="jchebet@email.arizona.edu"
 subjectForEmail= "Today's details of the used cars in tucson/phoenix area you asked for"
 carbonCopy = "mithunpaul08@gmail.com"
-bodyOfEmail="Hi,\n So the results you see below are what were newly found today. Everything else is same as what was sent yesterday. \nThese are the parameters used for this query:\n\n"
+#if on laptop dont switch path. This is required because cron runs as a separate process in a separate directory in chung
+#turn this to true, if pushing to run on chung.cs.arizona.edu
+isRunningOnServer=False;
+firstTimeRun=True;
+
+
+if(firstTimeRun):
+    bodyOfEmail="Hi, \nThese are the parameters used for this query:\n\n"
+else:
+    bodyOfEmail="Hi,\n So the results you see below are what were newly found today. Everything else is same as what was sent yesterday. \nThese are the parameters used for this query:\n\n"
+
+
 path = "/home/mithunpaul/allResearch/clscraper/main/src/"
+#pathonLaptop
+#path = "/home/mithunpaul/allResearch/clscraper/main/src/"
 
 #toget to:email id and my gmail password from command line
-if(len(sys.argv)>1):
+if(len(sys.argv)>2):
     gmailPwd=sys.argv[1]
     if (sys.argv[2]) is not None:
         toaddr = sys.argv[2]
@@ -123,13 +135,13 @@ def buildMessageBody(carObjectToBuildQuery):
 
 
 def encodeAndwriteToOutputFile(textToWrite):
-    target = open(stubFilename+'.txt', 'w')
+    target = open(stubFilename+'.txt', 'w+')
     target.write(html2text.html2text(textToWrite).encode('utf-8'))
     target.close()
 
 
 def writeToOutputFile(textToWrite):
-    target = open(stubFilename+'.txt', 'w')
+    target = open(stubFilename+'.txt', 'w+')
     target.write(textToWrite);
     target.close()
 
@@ -140,7 +152,8 @@ def AdduidToHashtable(uniqueId, localhtToCheck):
 
 def readFromJsonToHashtable(filename):
     # load from file:
-    with open(filename, 'r') as f:
+    htMyTable={}
+    with open(filename, 'w+') as f:
         try:
             #print("inside child :length of hashtable that just came in is:"+`carIdHashTable.__len__()`)
             #carIdHashTable["test"] = 1
@@ -157,7 +170,7 @@ def readFromJsonToHashtable(filename):
 
 def writeToFileAsJson(myhashTable, filename):
     # save to file:
-    with open(filename, 'w') as f:
+    with open(filename, 'w+') as f:
         json.dump(myhashTable, f)
     f.close()
 
@@ -165,8 +178,14 @@ def parseGResults(myQS):
     try:
         #3. read from file to hashtable
         carIdHashTable = {}
-        carIdHashTable=readFromJsonToHashtable(stubFilename)
+        # 1. store to hash table- in first pass
+        # if the file doesnt exist, create a new hashtable and add that to file
+        #  or if the bool flag firstTimeRun= true
+        carIdHashTable[445645423] = 1
+        if ((not (os.path.exists(stubFilename)))or firstTimeRun):
+            writeToFileAsJson(carIdHashTable, stubFilename)
 
+        carIdHashTable=readFromJsonToHashtable(stubFilename)
         carObjectToBuildQuery = myCar()
         fillSearchQueryAttributes(carObjectToBuildQuery)
         queryStringToSearch=createQueryObject(queryStringStubForTucson,carObjectToBuildQuery)
@@ -219,8 +238,7 @@ def parseGResults(myQS):
 
 
 
-                            # 1. store to hash table- in first pass
-                            #adduidToHashtable(uniquePageId)
+
 
 
                             #sys.exit(1)
@@ -309,7 +327,8 @@ def parseGResults(myQS):
 cwd = os.getcwd()
 print("current directory is:"+cwd)
 # Now change the directory
-os.chdir( path )
+if(isRunningOnServer):
+    os.chdir( path )
 
 
 parseGResults(actualQueryString)
