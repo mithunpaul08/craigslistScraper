@@ -24,20 +24,24 @@ gmailUsername="mithunpaul08@gmail.com"
         #print 'Number of arguments:', len(sys.argv)
         #print 'Argument List:', str(sys.argv)
 
-if(len(sys.argv)>1):
-    gmailPwd=sys.argv[1]
-else:
-    print("no password specified in Command Line. Exiting.")
-    sys.exit(1)
-
-
+gmailPwd=""
 fromaddr="mithunpaul08@gmail.com"
-#toaddr="mithunpaul08@gmail.com"
-toaddr="nithinitzme@gmail.com"
+toaddr="mithunpaul08@gmail.com"
+#toaddr="jchebet@email.arizona.edu"
 subjectForEmail= "Today's details of the used cars in tucson/phoenix area you asked for"
 carbonCopy = "mithunpaul08@gmail.com"
 bodyOfEmail="Hi,\n So the results you see below are what were newly found today. Everything else is same as what was sent yesterday. \nThese are the parameters used for this query:\n\n"
 path = "/home/mithunpaul/allResearch/clscraper/main/src/"
+
+#toget to:email id and my gmail password from command line
+if(len(sys.argv)>1):
+    gmailPwd=sys.argv[1]
+    if (sys.argv[2]) is not None:
+        toaddr = sys.argv[2]
+else:
+    print("not enough arguments in Command Line. Exiting.")
+    sys.exit(1)
+
 
 
 class myCar:
