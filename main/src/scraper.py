@@ -41,7 +41,8 @@ else:
     bodyOfEmail="Hi,\n So the results you see below are what were newly found today. Everything else is same as what was sent yesterday. \nThese are the parameters used for this query:\n\n"
 
 
-path = "/home/mithunpaul/allResearch/clscraper/main/src/"
+path="/home/mithunpaul/fall2016/clscraper/main/src/" 
+#path = "/home/mithunpaul/allResearch/clscraper/main/src/"
 #pathonLaptop
 #path = "/home/mithunpaul/allResearch/clscraper/main/src/"
 

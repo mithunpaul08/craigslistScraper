@@ -15,7 +15,12 @@ Code that gets the used car results of a given craigslist query, and converts it
 1.git clone git@github.com:mithunpaul08/craigslistScraper.git
 
 2. Go to src folder and type :python scraper.py
-Eg: mithunpaul@chung:~/Desktop/fall2016NLPResearch/googleScraper/googleScraping/main/src$ python scraper.py
+ python scraper.py frompwd toaddr
+
+ Eg:  python scraper.py password123 mithunpaul@email.arizona.edu
+ 
+ 
+ 
 
 #to change the parameters:
 Go to scraper.py and update the variables.
