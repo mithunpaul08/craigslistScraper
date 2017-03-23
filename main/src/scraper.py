@@ -75,10 +75,10 @@ def fillSearchQueryAttributes(queryCar):
     queryCar.min_price = "1"
     queryCar.max_price ="6000"
     queryCar.auto_make_model="honda+%7C+toyota"
-    queryCar.min_auto_year="2005"
-    queryCar.max_auto_year="2016"
+    queryCar.min_auto_year="2008"
+    queryCar.max_auto_year="2017"
     queryCar.min_auto_miles='1'
-    queryCar.max_auto_miles='110000'
+    queryCar.max_auto_miles='150000'
     queryCar.auto_title_status='1'
     queryCar.auto_transmission='1'
 
