@@ -17,7 +17,7 @@ Code that gets the used car results of a given craigslist query, and converts it
 2. Go to src folder and type :python scraper.py
  python scraper.py frompwd toaddr
 
- Eg:  python scraper.py password123 mithunpaul@email.arizona.edu
+ Eg:  python scraper.py password123 mithunpaul@gmail.com
  
  
  
@@ -53,4 +53,4 @@ bodyOfEmail="Hi,\n These are the parameters used for this query:\n\n"
 #Todo:
 1. attach SSH or PKI instead of typing in the pwd in raw text
 2. convert to excel sheet format
-3. send out alerts only if this posting hasnt been seen before.
+
