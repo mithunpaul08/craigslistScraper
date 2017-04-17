@@ -53,4 +53,6 @@ bodyOfEmail="Hi,\n These are the parameters used for this query:\n\n"
 #Todo:
 1. attach SSH or PKI instead of typing in the pwd in raw text
 2. convert to excel sheet format
+3. wrap it around a GUI to make noob friendly
+4. make an app out of it
 
