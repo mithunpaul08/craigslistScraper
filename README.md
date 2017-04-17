@@ -2,6 +2,9 @@
 
 Code that gets the used car results of a given craigslist query, and converts it to text
 
+#description
+So this is some code I wrote for a friend recently. Just sharing , just in case its useful for someone. This will automatically "keep an eye out" for anything on craigslist. That way if you want something, you dont have to consistently keep checking craigslist day in day out. As and when it shows up, this code with send you an email. Eg: used cars of a particular model/year/miles etc
+
 # Below are the prerequisites
 1. sudo pip install requests
 2. sudo pip install beautifulsoup4
